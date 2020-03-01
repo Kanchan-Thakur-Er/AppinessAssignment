@@ -68,24 +68,33 @@ public class EnterprisemailFragment extends Fragment {
 
         searchView();
         ListModel imageViewModel = ViewModelProviders.of(this, new ListModelProvider(application, retrofit, "api.json")).get(ListModel.class);
-        imageViewModel.apiResponseLiveData().observe(this, new Observer<List<ApiResponse>>() {
-            @Override
-            public void onChanged(@Nullable List<ApiResponse> imageResult) {
 
-imageResult1=imageResult;
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
-                rvList.setLayoutManager(linearLayoutManager);
-                Collections.sort(imageResult, new Comparator<ApiResponse>() {
-                    @Override
-                    public int compare(ApiResponse o1, ApiResponse o2) {
-                        return o1.getTitle().compareTo(o2.getTitle());
-                    }
-                });
-                listAdapter = new ListAdapter(getActivity(), EnterprisemailFragment.this, (ArrayList<ApiResponse>) imageResult);
-                rvList.setAdapter(listAdapter);
+        if (Comman.getInstance(getActivity()).isConnectingToInternet(getActivity())) {
 
-            }
-        });
+            imageViewModel.apiResponseLiveData().observe(this, new Observer<List<ApiResponse>>() {
+                @Override
+                public void onChanged(@Nullable List<ApiResponse> imageResult) {
+
+                    imageResult1 = imageResult;
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+                    rvList.setLayoutManager(linearLayoutManager);
+                    Collections.sort(imageResult, new Comparator<ApiResponse>() {
+                        @Override
+                        public int compare(ApiResponse o1, ApiResponse o2) {
+                            return o1.getTitle().compareTo(o2.getTitle());
+                        }
+                    });
+                    listAdapter = new ListAdapter(getActivity(), EnterprisemailFragment.this, (ArrayList<ApiResponse>) imageResult);
+                    rvList.setAdapter(listAdapter);
+
+                }
+            });
+        }
+
+        else{
+            Comman.getInstance(getActivity()).showDialog(getActivity(), getString(R.string.no_internetConnection));
+
+        }
     }
 
     private void searchView() {
